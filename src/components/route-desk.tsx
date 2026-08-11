@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ChartLineUp, CircleNotch } from "@phosphor-icons/react";
+import { ArrowRight, ChartLineUp, CircleNotch, Sparkle } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CheckResponse } from "@/lib/api";
@@ -190,6 +190,13 @@ export function RouteDesk() {
           </div>
         </div>
         <nav className="flex items-center gap-1.5">
+          <Link
+            href="/workspace"
+            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-muted transition hover:bg-foreground/[0.05] hover:text-foreground"
+          >
+            <Sparkle size={15} weight="bold" />
+            Workspace
+          </Link>
           <Link
             href="/insights"
             className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-muted transition hover:bg-foreground/[0.05] hover:text-foreground"
