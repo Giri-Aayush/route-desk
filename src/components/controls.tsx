@@ -1,6 +1,6 @@
 // Form primitives for the route checker. Presentational and controlled; all state
-// lives in the parent. One radius rule: controls are rounded-lg, chips and the
-// switch track are rounded-full.
+// lives in the parent. Shape rule: cards are rounded-2xl, controls rounded-xl,
+// chips and the switch track rounded-full. Orange is the one accent.
 
 import type { ReactNode } from "react";
 
@@ -17,15 +17,10 @@ export function Field({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <label
-        htmlFor={htmlFor}
-        className="text-sm font-medium text-zinc-800 dark:text-zinc-200"
-      >
+      <label htmlFor={htmlFor} className="text-sm font-medium text-foreground">
         {label}
       </label>
-      {hint ? (
-        <p className="-mt-1 text-xs text-zinc-500 dark:text-zinc-400">{hint}</p>
-      ) : null}
+      {hint ? <p className="-mt-1 text-xs text-muted">{hint}</p> : null}
       {children}
     </div>
   );
@@ -40,13 +35,17 @@ export function ChipMultiSelect({
   options,
   selected,
   onToggle,
+  maxHeightClass = "max-h-44",
 }: {
   options: Option[];
   selected: string[];
   onToggle: (value: string) => void;
+  maxHeightClass?: string;
 }) {
   return (
-    <div className="flex max-h-56 flex-wrap gap-2 overflow-y-auto rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
+    <div
+      className={`flex ${maxHeightClass} flex-wrap gap-2 overflow-y-auto pr-1`}
+    >
       {options.map((o) => {
         const on = selected.includes(o.value);
         return (
@@ -57,10 +56,10 @@ export function ChipMultiSelect({
             onClick={() => onToggle(o.value)}
             className={[
               "rounded-full px-3 py-1.5 text-sm font-medium transition",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 active:scale-[0.98]",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 active:scale-[0.97]",
               on
-                ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700",
+                ? "bg-foreground text-background"
+                : "bg-foreground/[0.05] text-foreground/75 hover:bg-foreground/[0.09] hover:text-foreground",
             ].join(" ")}
           >
             {o.label}
@@ -92,7 +91,7 @@ export function NativeSelect({
       value={value}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
-      className="rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+      className="rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground transition hover:border-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 disabled:opacity-50"
     >
       {placeholder ? <option value="">{placeholder}</option> : null}
       {options.map((o) => (
@@ -114,7 +113,7 @@ export function Segmented({
   options: Option[];
 }) {
   return (
-    <div className="inline-flex rounded-lg border border-zinc-200 bg-zinc-100/60 p-1 dark:border-zinc-800 dark:bg-zinc-800/40">
+    <div className="inline-flex rounded-xl border border-border/70 p-1">
       {options.map((o) => {
         const on = value === o.value;
         return (
@@ -123,11 +122,11 @@ export function Segmented({
             type="button"
             onClick={() => onChange(o.value)}
             className={[
-              "rounded-md px-3 py-1.5 text-sm font-medium transition",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400",
+              "rounded-lg px-3 py-1.5 text-sm font-medium transition",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/50",
               on
-                ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-900 dark:text-zinc-100"
-                : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200",
+                ? "bg-foreground text-background"
+                : "text-muted hover:text-foreground",
             ].join(" ")}
           >
             {o.label}
@@ -155,31 +154,25 @@ export function Switch({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="flex items-start gap-3 rounded-lg text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+      className="flex items-start gap-3 rounded-lg text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
     >
       <span
         className={[
           "relative mt-0.5 h-5 w-9 shrink-0 rounded-full transition-colors",
-          checked
-            ? "bg-zinc-900 dark:bg-zinc-100"
-            : "bg-zinc-200 dark:bg-zinc-700",
+          checked ? "bg-brand" : "bg-foreground/15",
         ].join(" ")}
       >
         <span
           className={[
-            "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform dark:bg-zinc-950",
+            "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform",
             checked ? "translate-x-4" : "translate-x-0.5",
           ].join(" ")}
         />
       </span>
       <span>
-        <span className="block text-sm font-medium text-zinc-800 dark:text-zinc-200">
-          {label}
-        </span>
+        <span className="block text-sm font-medium text-foreground">{label}</span>
         {description ? (
-          <span className="block text-xs text-zinc-500 dark:text-zinc-400">
-            {description}
-          </span>
+          <span className="block text-xs text-muted">{description}</span>
         ) : null}
       </span>
     </button>
