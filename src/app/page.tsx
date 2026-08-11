@@ -14,9 +14,7 @@ export default function Home() {
           Answers are computed from the rhino.fi API, not a table kept by hand.
         </p>
       </div>
-      <p className="text-sm text-foreground/50">
-        The checker is being built. See the design notes in <code>docs/DESIGN.md</code>.
-      </p>
+      <p className="text-sm text-foreground/50">The checker is being built.</p>
       <p className="text-xs text-foreground/40">
         Unofficial. Chain and token data belongs to rhino.fi.
       </p>

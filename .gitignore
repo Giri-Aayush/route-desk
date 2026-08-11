@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# documentation is kept out of the repo
+*.md
+
+# keep the committed env template despite the .env* rule above
+!.env.example
+
+# local agent tooling (installed skills), not part of the product
+.agents/
+.claude/
+skills-lock.json
