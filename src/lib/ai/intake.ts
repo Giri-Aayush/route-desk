@@ -1,12 +1,12 @@
-// Turn a prospect's plain-English message into a structured requirement. Claude
-// maps the language to chain IDs and token symbols; we then intersect the result
-// with the live catalog, so a chain or token the model invents is dropped and
-// surfaced as "unmapped" rather than fed into the check. Feasibility is never
-// decided here - that is /api/check on the requirement this returns.
+// Turn a prospect's plain-English message into a structured requirement. The model
+// maps the language to chain IDs and token symbols; we then intersect the result with
+// the live catalog, so a chain or token the model invents is dropped and surfaced as
+// "unmapped" rather than fed into the check. Feasibility is never decided here - that
+// is /api/check on the requirement this returns.
 
 import type { Catalog } from "@/lib/engine/catalog";
 import type { ArrivalForm, Requirement } from "@/lib/engine/types";
-import { AI_MODEL, aiClient, firstText } from "./client";
+import { getProvider } from "./provider";
 
 export interface ParsedIntake {
   requirement: Requirement;
@@ -17,7 +17,7 @@ export interface ParsedIntake {
   unmapped: string[];
 }
 
-const SCHEMA = {
+const SCHEMA: Record<string, unknown> = {
   type: "object",
   additionalProperties: false,
   properties: {
@@ -89,7 +89,7 @@ const SCHEMA = {
     "unmapped",
     "notes",
   ],
-} as const;
+};
 
 const SYSTEM = `You read a prospect's plain-English description of a payments or treasury flow and turn it into a structured routing requirement for rhino.fi's Route Desk.
 
@@ -103,15 +103,6 @@ Rules:
 
 function stringArray(v: unknown): string[] {
   return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
-}
-
-function safeParse(text: string): Record<string, unknown> {
-  try {
-    const v: unknown = JSON.parse(text);
-    return v && typeof v === "object" ? (v as Record<string, unknown>) : {};
-  } catch {
-    return {};
-  }
 }
 
 // Validate the model's output against the live catalog. Unknown chains and tokens
@@ -204,16 +195,12 @@ Prospect's message:
 ${message.trim()}
 """`;
 
-  const response = await aiClient().messages.create({
-    model: AI_MODEL,
-    max_tokens: 4096,
-    output_config: {
-      format: { type: "json_schema", schema: SCHEMA },
-      effort: "low",
-    },
+  const raw = await getProvider().extract({
     system: SYSTEM,
-    messages: [{ role: "user", content: user }],
+    user,
+    schema: SCHEMA,
+    maxTokens: 4096,
   });
 
-  return coerce(safeParse(firstText(response)), catalog, knownTokens);
+  return coerce(raw, catalog, knownTokens);
 }

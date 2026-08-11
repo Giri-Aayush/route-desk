@@ -1,9 +1,9 @@
 // Draft a client-ready reply from a verified check result. The model writes prose
-// only; every claim comes from the result it is handed, so it cannot promise a
-// route the engine marked blocked.
+// only; every claim comes from the result it is handed, so it cannot promise a route
+// the engine marked blocked.
 
 import type { CheckResult, Requirement } from "@/lib/engine/types";
-import { AI_MODEL, aiClient, firstText } from "./client";
+import { getProvider } from "./provider";
 
 const SYSTEM = `You are on rhino.fi's BD and sales team. Draft a short reply to a prospect, grounded strictly in the verified route check you are given.
 
@@ -64,17 +64,9 @@ export async function draftReply(input: {
   result: CheckResult;
   nameOf: (id: string) => string;
 }): Promise<string> {
-  const response = await aiClient().messages.create({
-    model: AI_MODEL,
-    max_tokens: 4096,
-    output_config: { effort: "medium" },
+  return getProvider().generate({
     system: SYSTEM,
-    messages: [
-      {
-        role: "user",
-        content: renderContext(input.requirement, input.result, input.nameOf),
-      },
-    ],
+    user: renderContext(input.requirement, input.result, input.nameOf),
+    maxTokens: 4096,
   });
-  return firstText(response).trim();
 }

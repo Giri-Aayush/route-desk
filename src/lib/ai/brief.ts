@@ -3,7 +3,7 @@
 // into a readable brief with a recommendation.
 
 import type { Insights } from "@/lib/analytics/types";
-import { AI_MODEL, aiClient, firstText } from "./client";
+import { getProvider } from "./provider";
 
 const SYSTEM = `You write a short demand brief for rhino.fi's BD and sales team from real Route Desk usage.
 
@@ -74,14 +74,9 @@ export async function draftBrief(input: {
   insights: Insights;
   nameOf: (id: string) => string;
 }): Promise<string> {
-  const response = await aiClient().messages.create({
-    model: AI_MODEL,
-    max_tokens: 4096,
-    output_config: { effort: "medium" },
+  return getProvider().generate({
     system: SYSTEM,
-    messages: [
-      { role: "user", content: renderInsights(input.insights, input.nameOf) },
-    ],
+    user: renderInsights(input.insights, input.nameOf),
+    maxTokens: 4096,
   });
-  return firstText(response).trim();
 }
