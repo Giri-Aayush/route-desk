@@ -40,8 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# documentation is kept out of the repo
+# documentation is kept out of the repo, except the README
 *.md
+!README.md
 
 # keep the committed env template despite the .env* rule above
 !.env.example
