@@ -144,9 +144,11 @@ export function AiWorkspace() {
           The AI workspace needs a key
         </h2>
         <p className="mt-2 max-w-lg text-sm text-muted">
-          Set <code className="text-foreground">ANTHROPIC_API_KEY</code> in the
-          server environment and reload. The checker and insights work without
-          it; this page is the only part that calls Claude.
+          Set the active provider&apos;s key in the server environment and reload:{" "}
+          <code className="text-foreground">ANTHROPIC_API_KEY</code>, or{" "}
+          <code className="text-foreground">AI_API_KEY</code> for an
+          OpenAI-compatible endpoint like an NVIDIA NIM. The checker and insights
+          work without it.
         </p>
         <p className="mt-3 text-xs text-muted">
           The model reads a prospect&apos;s message into a requirement and drafts

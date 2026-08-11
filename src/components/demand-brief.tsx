@@ -41,8 +41,8 @@ export function DemandBrief() {
   if (unconfigured) {
     return (
       <p className="text-sm text-muted">
-        Set <code className="text-foreground">ANTHROPIC_API_KEY</code> on the
-        server to turn this demand into a written brief.
+        Set the AI provider&apos;s key on the server to turn this demand into a
+        written brief.
       </p>
     );
   }
