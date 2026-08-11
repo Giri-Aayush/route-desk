@@ -23,9 +23,9 @@ const DEFAULT_DEPOSIT_CHAINS = ["ETHEREUM", "MATIC_POS", "TRON", "SOLANA"];
 const DEFAULT_DEPOSIT_TOKENS = ["USDT", "USDC"];
 
 const ARRIVAL_OPTIONS: Option[] = [
-  { value: "balance", label: "A balance" },
-  { value: "vault", label: "A vault position" },
-  { value: "contract-call", label: "A contract call" },
+  { value: "balance", label: "Balance" },
+  { value: "vault", label: "Vault" },
+  { value: "contract-call", label: "Contract" },
 ];
 
 function toggle(list: string[], value: string): string[] {
@@ -36,9 +36,7 @@ function toggle(list: string[], value: string): string[] {
 
 function Skeleton({ className = "" }: { className?: string }) {
   return (
-    <div
-      className={`animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800/60 ${className}`}
-    />
+    <div className={`animate-pulse rounded-2xl bg-border/60 ${className}`} />
   );
 }
 
@@ -164,206 +162,210 @@ export function RouteDesk() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[100dvh] w-full max-w-4xl flex-col gap-10 px-5 py-10 sm:px-8 sm:py-14">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+    <div className="relative flex min-h-[100dvh] flex-col lg:h-[100dvh] lg:overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-[radial-gradient(60%_100%_at_50%_0%,rgba(233,108,25,0.10),transparent_75%)]"
+      />
+
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-2.5 sm:px-8">
+        <div className="flex items-center gap-2.5">
+          <span
+            className="h-6 w-6 rounded-lg bg-gradient-to-br from-brand to-brand-strong shadow-sm"
+            aria-hidden
+          />
+          <h1 className="font-heading text-lg font-bold tracking-tight text-foreground">
             Route Desk
           </h1>
-          <p className="mt-1 max-w-xl text-sm text-zinc-500 dark:text-zinc-400">
-            Describe what you need to move. Route Desk checks each deposit chain
-            and token against rhino.fi&apos;s live API and tells you what is
-            clear, what needs a paid extension, and what cannot be done.
-          </p>
+          <span className="hidden text-sm text-muted sm:inline">
+            Live rhino.fi route checker
+          </span>
         </div>
-        <span className="rounded-full border border-zinc-200 px-2.5 py-1 text-xs font-medium text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+        <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted">
           Unofficial
         </span>
       </header>
 
-      {catalogError ? (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-5 text-sm dark:border-rose-500/25 dark:bg-rose-500/10">
-          <p className="font-semibold text-rose-800 dark:text-rose-300">
-            The check is unavailable
-          </p>
-          <p className="mt-1 text-rose-700/90 dark:text-rose-300/80">
-            {catalogError} The tool does not guess when it cannot reach the live
-            data. Please try again shortly.
-          </p>
-        </div>
-      ) : null}
+      <main className="flex-1 lg:min-h-0">
+        <div className="mx-auto grid h-full max-w-[1600px] grid-cols-1 lg:grid-cols-[minmax(400px,460px)_1fr]">
+          <section className="border-b border-border p-5 lg:h-full lg:overflow-y-auto lg:border-b-0 lg:border-r">
+            {catalog ? (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void runCheck();
+                }}
+                className="flex flex-col gap-4"
+              >
+                <Field label="Deposit chains" hint="Where funds come from.">
+                  <ChipMultiSelect
+                    options={chainOptions}
+                    selected={depositChains}
+                    onToggle={(v) => setDepositChains((c) => toggle(c, v))}
+                    maxHeightClass="max-h-40"
+                  />
+                </Field>
+                <Field label="Deposit tokens" hint="What funds arrive as.">
+                  <ChipMultiSelect
+                    options={tokenOptions}
+                    selected={depositTokens}
+                    onToggle={(v) => setDepositTokens((t) => toggle(t, v))}
+                    maxHeightClass="max-h-24"
+                  />
+                </Field>
 
-      {!catalog && !catalogError ? (
-        <div className="flex flex-col gap-4">
-          <Skeleton className="h-40" />
-          <Skeleton className="h-32" />
-        </div>
-      ) : null}
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Settlement chain" htmlFor="settlement-chain">
+                    <NativeSelect
+                      id="settlement-chain"
+                      value={settlementChain}
+                      onChange={onSettlementChainChange}
+                      options={chainOptions}
+                    />
+                  </Field>
+                  <Field label="Settlement token" htmlFor="settlement-token">
+                    <NativeSelect
+                      id="settlement-token"
+                      value={settlementToken}
+                      onChange={setSettlementToken}
+                      options={settlementTokenOptions}
+                    />
+                  </Field>
+                </div>
 
-      {catalog ? (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void runCheck();
-          }}
-          className="flex flex-col gap-6 rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900 sm:p-6"
-        >
-          <div className="grid gap-6 sm:grid-cols-2">
-            <Field label="Deposit chains" hint="Where funds come from.">
-              <ChipMultiSelect
-                options={chainOptions}
-                selected={depositChains}
-                onToggle={(v) => setDepositChains((c) => toggle(c, v))}
-              />
-            </Field>
-            <Field label="Deposit tokens" hint="What funds arrive as.">
-              <ChipMultiSelect
-                options={tokenOptions}
-                selected={depositTokens}
-                onToggle={(v) => setDepositTokens((t) => toggle(t, v))}
-              />
-            </Field>
-          </div>
+                <div className="grid grid-cols-[1fr_1.5fr] gap-4">
+                  <Field label="Amount (USD)" htmlFor="amount" hint="Limits and cost.">
+                    <div className="flex items-center rounded-xl border border-border bg-surface pl-3 focus-within:ring-2 focus-within:ring-brand/50">
+                      <span className="text-sm text-muted">$</span>
+                      <input
+                        id="amount"
+                        inputMode="decimal"
+                        value={amountUsd}
+                        onChange={(e) => setAmountUsd(e.target.value)}
+                        className="w-full bg-transparent px-2 py-2.5 text-sm text-foreground focus:outline-none"
+                      />
+                    </div>
+                  </Field>
+                  <Field label="Funds arrive as" hint="Non-balance needs Onchain Actions.">
+                    <Segmented
+                      value={arrivalForm}
+                      onChange={(v) => setArrivalForm(v as ArrivalForm)}
+                      options={ARRIVAL_OPTIONS}
+                    />
+                  </Field>
+                </div>
 
-          <div className="grid gap-6 sm:grid-cols-3">
-            <Field label="Settlement chain" htmlFor="settlement-chain">
-              <NativeSelect
-                id="settlement-chain"
-                value={settlementChain}
-                onChange={onSettlementChainChange}
-                options={chainOptions}
-              />
-            </Field>
-            <Field label="Settlement token" htmlFor="settlement-token">
-              <NativeSelect
-                id="settlement-token"
-                value={settlementToken}
-                onChange={setSettlementToken}
-                options={settlementTokenOptions}
-              />
-            </Field>
-            <Field label="Amount (USD)" htmlFor="amount" hint="Used for limits and cost.">
-              <div className="flex items-center rounded-lg border border-zinc-200 bg-white pl-3 focus-within:ring-2 focus-within:ring-zinc-400 dark:border-zinc-800 dark:bg-zinc-900">
-                <span className="text-sm text-zinc-400">$</span>
-                <input
-                  id="amount"
-                  inputMode="decimal"
-                  value={amountUsd}
-                  onChange={(e) => setAmountUsd(e.target.value)}
-                  className="w-full bg-transparent px-2 py-2.5 text-sm text-zinc-900 focus:outline-none dark:text-zinc-100"
-                />
+                <Field label="Commercial requirements">
+                  <div className="flex flex-col gap-2">
+                    <Switch
+                      checked={guaranteedRate}
+                      onChange={setGuaranteedRate}
+                      label="Guaranteed conversion rate"
+                      description="Forces 1:1 Stablecoin Swaps."
+                    />
+                    <Switch
+                      checked={clientSurcharge}
+                      onChange={setClientSurcharge}
+                      label="Surcharge on top of rhino fees"
+                      description="Forces Advanced Fee & Limit Management."
+                    />
+                    <Switch
+                      checked={enhancedScreening}
+                      onChange={setEnhancedScreening}
+                      label="Screening beyond the standard set"
+                      description="Forces Enhanced Compliance & Risk Management."
+                    />
+                  </div>
+                </Field>
+
+                <div className="sticky bottom-0 -mx-5 -mb-5 mt-1 border-t border-border bg-background/90 px-5 py-3 backdrop-blur">
+                  <button
+                    type="submit"
+                    disabled={!canCheck || checking}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 active:scale-[0.99] disabled:opacity-40"
+                  >
+                    {checking ? (
+                      <CircleNotch
+                        size={16}
+                        weight="bold"
+                        className="animate-spin"
+                      />
+                    ) : (
+                      <ArrowRight size={16} weight="bold" />
+                    )}
+                    {checking ? "Checking" : "Check routes"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <Skeleton className="h-40" />
+                <Skeleton className="h-28" />
+                <Skeleton className="h-24" />
+                <Skeleton className="h-28" />
               </div>
-            </Field>
-          </div>
+            )}
+          </section>
 
-          <div className="grid gap-6 sm:grid-cols-2">
-            <Field
-              label="Funds should arrive as"
-              hint="Anything other than a balance needs Automated Onchain Actions."
-            >
-              <Segmented
-                value={arrivalForm}
-                onChange={(v) => setArrivalForm(v as ArrivalForm)}
-                options={ARRIVAL_OPTIONS}
-              />
-            </Field>
-            <Field label="Commercial requirements">
-              <div className="flex flex-col gap-3">
-                <Switch
-                  checked={guaranteedRate}
-                  onChange={setGuaranteedRate}
-                  label="Guaranteed conversion rate"
-                  description="Forces 1:1 Stablecoin Swaps."
-                />
-                <Switch
-                  checked={clientSurcharge}
-                  onChange={setClientSurcharge}
-                  label="Surcharge on top of rhino fees"
-                  description="Forces Advanced Fee & Limit Management."
-                />
-                <Switch
-                  checked={enhancedScreening}
-                  onChange={setEnhancedScreening}
-                  label="Screening beyond the standard set"
-                  description="Forces Enhanced Compliance & Risk Management."
-                />
+          <section className="flex flex-col gap-4 p-5 lg:h-full lg:overflow-y-auto">
+            {catalogError ? (
+              <div className="rounded-2xl border border-red-500/25 bg-red-500/10 p-5 text-sm">
+                <p className="font-semibold text-red-700 dark:text-red-400">
+                  The check is unavailable
+                </p>
+                <p className="mt-1 text-red-700/90 dark:text-red-300/80">
+                  {catalogError} The tool does not guess when it cannot reach the
+                  live data. Please try again shortly.
+                </p>
               </div>
-            </Field>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="submit"
-              disabled={!canCheck || checking}
-              className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 active:scale-[0.99] disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
-            >
-              {checking ? (
-                <CircleNotch size={16} weight="bold" className="animate-spin" />
-              ) : (
-                <ArrowRight size={16} weight="bold" />
-              )}
-              {checking ? "Checking" : "Check routes"}
-            </button>
-            {!canCheck ? (
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                Pick at least one deposit chain and token, and a settlement.
-              </span>
-            ) : null}
-          </div>
-        </form>
-      ) : null}
-
-      {checkError ? (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-5 text-sm dark:border-rose-500/25 dark:bg-rose-500/10">
-          <p className="font-semibold text-rose-800 dark:text-rose-300">
-            The check could not run
-          </p>
-          <p className="mt-1 text-rose-700/90 dark:text-rose-300/80">
-            {checkError}
-          </p>
+            ) : checkError ? (
+              <div className="rounded-2xl border border-red-500/25 bg-red-500/10 p-5 text-sm">
+                <p className="font-semibold text-red-700 dark:text-red-400">
+                  The check could not run
+                </p>
+                <p className="mt-1 text-red-700/90 dark:text-red-300/80">
+                  {checkError}
+                </p>
+              </div>
+            ) : (checking && !result) || !catalog ? (
+              <>
+                <div className="grid grid-cols-3 gap-3">
+                  <Skeleton className="h-20" />
+                  <Skeleton className="h-20" />
+                  <Skeleton className="h-20" />
+                </div>
+                <Skeleton className="h-64" />
+              </>
+            ) : result ? (
+              <>
+                <Results
+                  key={result.fetchedAt}
+                  result={result}
+                  chainName={chainName}
+                  settlementChain={settlementChain}
+                  settlementToken={settlementToken}
+                  amount={Number(amountUsd) > 0 ? amountUsd : "1000"}
+                />
+                <ContactHandoff
+                  requirement={requirement}
+                  result={result}
+                  chainName={chainName}
+                />
+                <p className="text-xs text-muted">
+                  Route and token data belongs to rhino.fi. Unofficial, not
+                  affiliated with rhino.fi. Checked against live rhino.fi data.
+                </p>
+              </>
+            ) : (
+              <div className="flex min-h-[240px] flex-1 items-center justify-center rounded-2xl border border-dashed border-border p-8 text-center">
+                <p className="text-sm text-muted">
+                  Set a requirement and press Check routes.
+                </p>
+              </div>
+            )}
+          </section>
         </div>
-      ) : null}
-
-      {checking && !result ? (
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-3 gap-3">
-            <Skeleton className="h-20" />
-            <Skeleton className="h-20" />
-            <Skeleton className="h-20" />
-          </div>
-          <Skeleton className="h-48" />
-        </div>
-      ) : null}
-
-      {result ? (
-        <>
-          <Results
-            key={result.fetchedAt}
-            result={result}
-            chainName={chainName}
-            settlementChain={settlementChain}
-            settlementToken={settlementToken}
-            amount={Number(amountUsd) > 0 ? amountUsd : "1000"}
-          />
-          <ContactHandoff
-            requirement={requirement}
-            result={result}
-            chainName={chainName}
-          />
-        </>
-      ) : null}
-
-      <footer className="mt-auto border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
-        <p>
-          Route and token data belongs to rhino.fi. This tool is unofficial and
-          not affiliated with, endorsed by, or operated by rhino.fi.
-        </p>
-        {result ? (
-          <p className="mt-1 text-zinc-400 dark:text-zinc-500">
-            Support checked against live rhino.fi data.
-          </p>
-        ) : null}
-      </footer>
+      </main>
     </div>
   );
 }

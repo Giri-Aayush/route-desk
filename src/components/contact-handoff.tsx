@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy } from "@phosphor-icons/react";
+import { CaretDown, Check, Copy } from "@phosphor-icons/react";
 import { useState } from "react";
 import type { CheckResponse } from "@/lib/api";
 import type { Requirement } from "@/lib/engine/types";
@@ -82,10 +82,7 @@ function ContactInput({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label
-        htmlFor={id}
-        className="text-xs font-medium text-zinc-600 dark:text-zinc-400"
-      >
+      <label htmlFor={id} className="text-xs font-medium text-muted">
         {label}
       </label>
       <input
@@ -94,7 +91,7 @@ function ContactInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600"
+        className="rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-muted/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
       />
     </div>
   );
@@ -113,6 +110,8 @@ export function ContactHandoff({
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
   const [copied, setCopied] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const enquiry = buildEnquiry(requirement, result, chainName, {
     name,
@@ -131,52 +130,81 @@ export function ContactHandoff({
   }
 
   return (
-    <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-      <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-        Take this to rhino.fi
-      </h3>
-      <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-        Copy the scoped enquiry below and send it through the rhino.fi contact
-        form. It arrives already covering the routes and the extensions.
-      </p>
-
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        <ContactInput
-          id="contact-name"
-          label="Name"
-          value={name}
-          onChange={setName}
-          placeholder="Jordan Alvarez"
-        />
-        <ContactInput
-          id="contact-email"
-          label="Work email"
-          type="email"
-          value={email}
-          onChange={setEmail}
-          placeholder="jordan@company.com"
-        />
-        <ContactInput
-          id="contact-company"
-          label="Company (optional)"
-          value={company}
-          onChange={setCompany}
-          placeholder="Company"
-        />
-      </div>
-
-      <pre className="mt-4 max-h-64 overflow-auto rounded-lg border border-zinc-200 bg-zinc-50 p-4 font-mono text-xs leading-relaxed text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
-        {enquiry}
-      </pre>
-
+    <section className="rounded-2xl border border-border bg-surface">
       <button
         type="button"
-        onClick={copy}
-        className="mt-4 inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 active:scale-[0.99] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 p-4 text-left"
       >
-        {copied ? <Check size={16} weight="bold" /> : <Copy size={16} />}
-        {copied ? "Copied" : "Copy enquiry"}
+        <span>
+          <span className="block text-sm font-semibold text-foreground">
+            Take this to rhino.fi
+          </span>
+          <span className="block text-xs text-muted">
+            A scoped enquiry covering the routes and the extensions, ready to
+            copy into the rhino.fi contact form.
+          </span>
+        </span>
+        <CaretDown
+          size={16}
+          weight="bold"
+          className={`shrink-0 text-muted transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
+
+      {open ? (
+        <div className="border-t border-border p-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <ContactInput
+              id="contact-name"
+              label="Name"
+              value={name}
+              onChange={setName}
+              placeholder="Jordan Alvarez"
+            />
+            <ContactInput
+              id="contact-email"
+              label="Work email"
+              type="email"
+              value={email}
+              onChange={setEmail}
+              placeholder="jordan@company.com"
+            />
+            <ContactInput
+              id="contact-company"
+              label="Company (optional)"
+              value={company}
+              onChange={setCompany}
+              placeholder="Company"
+            />
+          </div>
+
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={copy}
+              className="inline-flex items-center gap-2 rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 active:scale-[0.99]"
+            >
+              {copied ? <Check size={16} weight="bold" /> : <Copy size={16} />}
+              {copied ? "Copied" : "Copy enquiry"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowPreview((v) => !v)}
+              className="text-xs font-medium text-muted underline-offset-4 hover:text-foreground hover:underline"
+            >
+              {showPreview ? "Hide preview" : "Preview"}
+            </button>
+          </div>
+
+          {showPreview ? (
+            <pre className="mt-3 max-h-52 overflow-auto whitespace-pre-wrap rounded-xl border border-border bg-surface-2 p-4 font-sans text-xs leading-relaxed text-foreground/80">
+              {enquiry}
+            </pre>
+          ) : null}
+        </div>
+      ) : null}
     </section>
   );
 }
