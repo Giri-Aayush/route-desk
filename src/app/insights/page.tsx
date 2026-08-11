@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { DemandBrief } from "@/components/demand-brief";
 import { aggregate } from "@/lib/analytics/aggregate";
 import { readChecks } from "@/lib/analytics/store";
 import type { CountRow, DemandRow } from "@/lib/analytics/types";
@@ -196,6 +197,13 @@ export default async function InsightsPage() {
             />
             <Stat label="Since" value={formatDate(insights.since)} />
           </section>
+
+          <Section
+            title="Weekly brief"
+            subtitle="A written summary of the demand below, for a standup or a planning doc."
+          >
+            <DemandBrief />
+          </Section>
 
           <Section
             title="Requested but not supported"
