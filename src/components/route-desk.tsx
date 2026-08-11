@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowRight, CircleNotch } from "@phosphor-icons/react";
+import { ArrowRight, ChartLineUp, CircleNotch } from "@phosphor-icons/react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CheckResponse } from "@/lib/api";
 import { fetchCatalog, fetchCheck } from "@/lib/api";
@@ -181,9 +182,18 @@ export function RouteDesk() {
             Live rhino.fi route checker
           </span>
         </div>
-        <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted">
-          Unofficial
-        </span>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/insights"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted transition hover:text-foreground"
+          >
+            <ChartLineUp size={15} weight="bold" />
+            Insights
+          </Link>
+          <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted">
+            Unofficial
+          </span>
+        </div>
       </header>
 
       <main className="flex-1 lg:min-h-0">
