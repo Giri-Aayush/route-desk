@@ -169,31 +169,38 @@ export function RouteDesk() {
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-[radial-gradient(60%_100%_at_50%_0%,rgba(233,108,25,0.10),transparent_75%)]"
       />
 
-      <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-2.5 sm:px-8">
-        <div className="flex items-center gap-2.5">
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-3 sm:px-8">
+        <div className="flex items-center gap-3">
           <span
-            className="h-6 w-6 rounded-lg bg-gradient-to-br from-brand to-brand-strong shadow-sm"
+            className="h-7 w-7 rounded-[9px] bg-gradient-to-br from-brand to-brand-strong shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_1px_2px_rgba(0,0,0,0.12)]"
             aria-hidden
           />
-          <h1 className="font-heading text-lg font-bold tracking-tight text-foreground">
-            Route Desk
-          </h1>
-          <span className="hidden text-sm text-muted sm:inline">
-            Live rhino.fi route checker
-          </span>
+          <div className="flex items-center gap-2.5">
+            <h1 className="font-heading text-lg font-bold tracking-tight text-foreground">
+              Route Desk
+            </h1>
+            <span aria-hidden className="hidden h-3.5 w-px bg-border sm:block" />
+            <span className="hidden items-center gap-1.5 text-sm text-muted sm:flex">
+              <span className="relative flex h-1.5 w-1.5" aria-hidden>
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500/70" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              </span>
+              Live rhino.fi data
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
+        <nav className="flex items-center gap-1.5">
           <Link
             href="/insights"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted transition hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-muted transition hover:bg-foreground/[0.05] hover:text-foreground"
           >
             <ChartLineUp size={15} weight="bold" />
             Insights
           </Link>
-          <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted">
+          <span className="rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted">
             Unofficial
           </span>
-        </div>
+        </nav>
       </header>
 
       <main className="flex-1 lg:min-h-0">
