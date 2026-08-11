@@ -4,6 +4,7 @@
 // check. Returns the verdict grid, the extensions the request forces, and a summary.
 
 import { NextResponse } from "next/server";
+import { recordCheck } from "@/lib/analytics/store";
 import { buildCatalog } from "@/lib/engine/catalog";
 import { runCheck, type SdaByDepositChain } from "@/lib/engine/check";
 import type { Requirement } from "@/lib/engine/types";
@@ -137,6 +138,22 @@ export async function POST(request: Request) {
       sdaByDepositChain,
       representativeAmountUsd: amountUsd ?? DEFAULT_AMOUNT_USD,
     });
+
+    // Capture the check for demand analytics. Best-effort: a store failure must
+    // never break the check itself, so this is fire-and-forget.
+    void recordCheck({
+      at: new Date().toISOString(),
+      settlementChain: requirement.settlementChain,
+      settlementToken: requirement.settlementToken,
+      amountUsd,
+      routes: result.routes.map((r) => ({
+        chain: r.depositChain,
+        token: r.depositToken,
+        outcome: r.outcome,
+        reason: r.reason,
+      })),
+      extensions: result.extensions.map((e) => e.name),
+    }).catch(() => {});
 
     return NextResponse.json({ ...result, fetchedAt: catalog.fetchedAt });
   } catch (err) {
